@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>搭建专属于自己的个人博客</title>
-    <url>/post/build_your_blog</url>
+    <url>/post/build_your_blog.html</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>你是否想拥有属于自己的博客，但是又由于不会前端知识、web框架等等 或者 花费时间多 而苦恼，不用担心。接下来跟着这篇文章，你将花费不到20分钟时间拥有自己的博客！！！</p>
 <h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>首先，来讲解一下原理。<br>咱们主要是通过hexo + GitHub Pages 来搭建自己的博客的。<br>下面是 GitHub Pages、hexo的官方说明。</p>
 <blockquote>
