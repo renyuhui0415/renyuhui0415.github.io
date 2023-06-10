@@ -157,6 +157,9 @@ hexo d #部署网站
 <h1 id="根据个人喜好修改配置"><a href="#根据个人喜好修改配置" class="headerlink" title="根据个人喜好修改配置"></a>根据个人喜好修改配置</h1><p>hexo提供了好多主题，大家可以根据自己喜欢去选择一个合适主题，跟着主题文档去修改即可。<a class="link"   href="https://hexo.io/themes/" >theme <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 <h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>在安装过程中可能会遇到一些报错，大家不用慌，大部分是因为网络原因导致的，耐心尝试即可！<br>注意：有什么不会的查hexo官方文档即可，<a class="link"   href="https://hexo.io/zh-cn/docs/index.html" >hexo官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>  </p>
 ]]></content>
+      <categories>
+        <category>build your blog</category>
+      </categories>
       <tags>
         <tag>hexo</tag>
         <tag>github.io</tag>
