@@ -103,10 +103,9 @@
                      data-src="/../img/build_your_blog/11.png"
                      
                 ></p>
-<p>接下来咱们先看一下hexo的指令，这样才会操作。<a class="link"   href="https://hexo.io/zh-cn/docs/commands.html" >hexo指令 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>首先是新建一个网站 + 在本地运行</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo init # 默认在当前文件夹新建一个网站</span><br><span class="line">hexo d # 启动访问，默认在http://localhost:4000/</span><br></pre></td></tr></table></figure></div>
-
-<p><img  
+<p>下一步是安装hexo<br><code>npm install -g hexo-cli</code><br>安装后，可以使用 <code>hexo -v</code>查看是否安装成功，若安装不成功，可以在评论区留言。<br>接下来咱们先看一下hexo的指令，这样才会操作。<a class="link"   href="https://hexo.io/zh-cn/docs/commands.html" >hexo指令 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>首先是新建一个网站 + 在本地运行</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo init # 默认在当前文件夹新建一个网站</span><br><span class="line">hexo s # 启动访问，默认在http://localhost:4000/</span><br></pre></td></tr></table></figure></div>
+<p>注意: hexo init初始化时，文件夹必须为空！！！<br><img  
                      lazyload
                      src="/images/loading.svg"
                      data-src="/../img/build_your_blog/12.png"
