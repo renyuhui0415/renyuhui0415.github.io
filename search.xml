@@ -1,170 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>搭建专属于自己的个人博客</title>
-    <url>/post/build_your_blog.html</url>
-    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>你是否想拥有属于自己的博客，但是又由于不会前端知识、web框架等等 或者 花费时间多 而苦恼，不用担心。接下来跟着这篇文章，你将花费不到20分钟时间拥有自己的博客！！！</p>
-<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>首先，来讲解一下原理。<br>咱们主要是通过hexo + GitHub Pages 来搭建自己的博客的。<br>下面是 GitHub Pages、hexo的官方说明。</p>
-<blockquote>
-<p>GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。</p>
-</blockquote>
-<blockquote>
-<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
-</blockquote>
-<p>刚好hexo又提供了一键部署的功能，可以把网站一键部署到GitHub Pages。</p>
-<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><h2 id="node-js-安装-配置"><a href="#node-js-安装-配置" class="headerlink" title="node.js 安装 + 配置"></a>node.js 安装 + 配置</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p><a class="link"   href="https://pc.qq.com/detail/5/detail_24845.html" >点击即可安装node.js <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>腾讯软件中心下载的比较快，建议在D盘创建一个node.js文件夹。<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/node.js_folder.png"
-                      alt="node.js文件夹内容"
-                ><br>打开电脑终端，输入 node -v、npm -v两个命令查看是否安装成功。<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/check.png"
-                      alt="检查是否安装成功"
-                ></p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><ul>
-<li><p>在node.js文件夹下创建 node_global、node_cache文件夹,设置 npm 的全局安装路径和缓存路径.</p>
-  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set prefix &quot;D:\nodejs\node_global&quot;</span><br><span class="line">npm config set cache &quot;D:\nodejs\node_cache&quot;</span><br></pre></td></tr></table></figure></div></li>
-<li><p>添加环境变量<br>  win11系统下添加变量步骤: 设置 -&gt; 系统 -&gt; 系统信息 -&gt; 高级系统设置 -&gt; 环境变量<br>  1、添加系统变量  </p>
-<p>  <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/2.png"
-                     
-                ><br>  <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/3.png"
-                     
-                >  </p>
-<p>  2、添加环境变量  </p>
-<p>  <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/4.png"
-                     
-                ></p>
-</li>
-</ul>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>接下来咱们测试一下是否配置成功。  </p>
-<p><code>npm install express -g</code></p>
-<p>如果出现下面报错的话</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install express -g</span><br><span class="line">npm ERR! code ETIMEDOUT</span><br><span class="line">npm ERR! syscall connect</span><br><span class="line">npm ERR! errno ETIMEDOUT</span><br><span class="line">npm ERR! network request to https://registry.npmjs.org/express failed, reason: connect ETIMEDOUT 104.16.18.35:443</span><br><span class="line">npm ERR! network This is a problem related to network connectivity.</span><br><span class="line">npm ERR! network In most cases you are behind a proxy or have bad network settings.</span><br><span class="line">npm ERR! network</span><br><span class="line">npm ERR! network If you are behind a proxy, please make sure that the</span><br><span class="line">npm ERR! network &#x27;proxy&#x27; config is set properly.  See: &#x27;npm help config&#x27;</span><br><span class="line"></span><br><span class="line">npm ERR! Log files were not written due to an error writing to the directory: D:\node.js\node_cache\_logs</span><br><span class="line">npm ERR! You can rerun the command with `--loglevel=verbose` to see the logs in your terminal</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<p>这是npm镜像问题，需要更换npm镜像，改为淘宝的镜像。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry https://registry.npm.taobao.org/</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="安装其他依赖"><a href="#安装其他依赖" class="headerlink" title="安装其他依赖"></a>安装其他依赖</h3><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm</span><br><span class="line">npm install webpack -g</span><br></pre></td></tr></table></figure></div>
-<p>此部分参考链接: <a class="link"   href="https://blog.csdn.net/weixin_52799373/article/details/123840137" >七维大脑的博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>注意有些时候需要用管理员去打开cmd，可以选择把cmd发送到桌面，然后右键以管理员权限打开即可。  </p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/5.png"
-                     
-                ></p>
-<p>这样每次都是管理员身份打开了。  </p>
-<h2 id="安装-配置-Git"><a href="#安装-配置-Git" class="headerlink" title="安装+配置 Git"></a>安装+配置 Git</h2><p><a class="link"   href="https://pc.qq.com/detail/13/detail_22693.html" >点击安装Git <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<ul>
-<li>配置Git全局用户名和邮箱  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">git config --global user.name &quot;Your Name&quot;</span><br><span class="line">git config --global user.email &quot;your-email@example.com&quot;</span><br></pre></td></tr></table></figure></div></li>
-<li>添加 SSH Key到GitHub账号<br>  首先生成SSH Key  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;邮箱地址&quot;</span><br></pre></td></tr></table></figure></div>
-  生成后，会给出地址的，一般是在 C:&#x2F;user&#x2F;用户名&#x2F;.ssh&#x2F;id_rsa.pub<br>  复制后，去github绑定<br>  点击头像 -&gt; settings<br>  <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/6.png"
-                     
-                ><br>  检测是否成功  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure></div>
-  <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/7.png"
-                     
-                ></li>
-</ul>
-<h1 id="创建博客项目"><a href="#创建博客项目" class="headerlink" title="创建博客项目"></a>创建博客项目</h1><h2 id="Github创建仓库"><a href="#Github创建仓库" class="headerlink" title="Github创建仓库"></a>Github创建仓库</h2><p>首页有一个new，点击即可新建<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/8.png"
-                     
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/9.png"
-                     
-                >  </p>
-<h2 id="本地仓库创建"><a href="#本地仓库创建" class="headerlink" title="本地仓库创建"></a>本地仓库创建</h2><p>首先去D盘创建一个文件夹，把读写权限打开，否则后期会有权限问题出现。<br>新建文件夹blog，右键点击属性 -&gt; 安全，把user权限打开<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/10.png"
-                     
-                ></p>
-<h2 id="本地访问博客"><a href="#本地访问博客" class="headerlink" title="本地访问博客"></a>本地访问博客</h2><p>在blog文件夹 右键 -&gt; 显示更多选项 -&gt; git bash<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/11.png"
-                     
-                ></p>
-<p>下一步是安装hexo<br><code>npm install -g hexo-cli</code><br>安装后，可以使用 <code>hexo -v</code>查看是否安装成功，若安装不成功，可以在评论区留言。<br>接下来咱们先看一下hexo的指令，这样才会操作。<a class="link"   href="https://hexo.io/zh-cn/docs/commands.html" >hexo指令 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>首先是新建一个网站 + 在本地运行</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo init # 默认在当前文件夹新建一个网站</span><br><span class="line">hexo s # 启动访问，默认在http://localhost:4000/</span><br></pre></td></tr></table></figure></div>
-<p>注意: hexo init初始化时，文件夹必须为空！！！<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/12.png"
-                     
-                ></p>
-<p>git bash 里面 ctrl + c关闭服务<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/13.png"
-                     
-                ></p>
-<h1 id="部署个人博客"><a href="#部署个人博客" class="headerlink" title="部署个人博客"></a>部署个人博客</h1><p>部署个人博客的话，咱们直接跟着官网走即可 <a class="link"   href="https://hexo.io/zh-cn/docs/one-command-deployment.html" >部署 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/14.png"
-                     
-                >  </p>
-<p>咱们选择的部署插件是git首先安装插件，并更改配置文件<br><code>npm install hexo-deployer-git --save</code><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/16.png"
-                     
-                ><br>修改配置文件<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/15.png"
-                     
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/17.png"
-                     
-                ><br>接下来两行命令就可以创建出自己的博客网站了。  </p>
-<pre><code>hexo g #生成静态文件
-hexo d #部署网站
-</code></pre>
-<p>此时GitHub仓库已经有刚才生成的静态文件了，而且博客网站已经可以访问了。<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/18.png"
-                     
-                ><br>博客地址<br><code>https://username.github.io</code><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../img/build_your_blog/19.png"
-                     
-                ><br>这样就部署好网站了，接下来开始配置自己的网站了。</p>
-<h1 id="根据个人喜好修改配置"><a href="#根据个人喜好修改配置" class="headerlink" title="根据个人喜好修改配置"></a>根据个人喜好修改配置</h1><p>hexo提供了好多主题，大家可以根据自己喜欢去选择一个合适主题，跟着主题文档去修改即可。<a class="link"   href="https://hexo.io/themes/" >theme <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>在安装过程中可能会遇到一些报错，大家不用慌，大部分是因为网络原因导致的，耐心尝试即可！<br>注意：有什么不会的查hexo官方文档即可，<a class="link"   href="https://hexo.io/zh-cn/docs/index.html" >hexo官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>  </p>
-]]></content>
-      <categories>
-        <category>build your blog</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-        <tag>github.io</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Deep Learning Data Operation</title>
     <url>/post/deep_learning_data_operation.html</url>
     <content><![CDATA[<h1 id="什么是深度学习"><a href="#什么是深度学习" class="headerlink" title="什么是深度学习"></a>什么是深度学习</h1><blockquote>
@@ -368,6 +204,170 @@ hexo d #部署网站
         <tag>AI</tag>
         <tag>Data_Operation</tag>
         <tag>Preliminary_knowledge</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>搭建专属于自己的个人博客</title>
+    <url>/post/build_your_blog.html</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>你是否想拥有属于自己的博客，但是又由于不会前端知识、web框架等等 或者 花费时间多 而苦恼，不用担心。接下来跟着这篇文章，你将花费不到20分钟时间拥有自己的博客！！！</p>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>首先，来讲解一下原理。<br>咱们主要是通过hexo + GitHub Pages 来搭建自己的博客的。<br>下面是 GitHub Pages、hexo的官方说明。</p>
+<blockquote>
+<p>GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。</p>
+</blockquote>
+<blockquote>
+<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
+</blockquote>
+<p>刚好hexo又提供了一键部署的功能，可以把网站一键部署到GitHub Pages。</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><h2 id="node-js-安装-配置"><a href="#node-js-安装-配置" class="headerlink" title="node.js 安装 + 配置"></a>node.js 安装 + 配置</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p><a class="link"   href="https://pc.qq.com/detail/5/detail_24845.html" >点击即可安装node.js <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>腾讯软件中心下载的比较快，建议在D盘创建一个node.js文件夹。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/node.js_folder.png"
+                      alt="node.js文件夹内容"
+                ><br>打开电脑终端，输入 node -v、npm -v两个命令查看是否安装成功。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/check.png"
+                      alt="检查是否安装成功"
+                ></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><ul>
+<li><p>在node.js文件夹下创建 node_global、node_cache文件夹,设置 npm 的全局安装路径和缓存路径.</p>
+  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set prefix &quot;D:\nodejs\node_global&quot;</span><br><span class="line">npm config set cache &quot;D:\nodejs\node_cache&quot;</span><br></pre></td></tr></table></figure></div></li>
+<li><p>添加环境变量<br>  win11系统下添加变量步骤: 设置 -&gt; 系统 -&gt; 系统信息 -&gt; 高级系统设置 -&gt; 环境变量<br>  1、添加系统变量  </p>
+<p>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/2.png"
+                     
+                ><br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/3.png"
+                     
+                >  </p>
+<p>  2、添加环境变量  </p>
+<p>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/4.png"
+                     
+                ></p>
+</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>接下来咱们测试一下是否配置成功。  </p>
+<p><code>npm install express -g</code></p>
+<p>如果出现下面报错的话</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install express -g</span><br><span class="line">npm ERR! code ETIMEDOUT</span><br><span class="line">npm ERR! syscall connect</span><br><span class="line">npm ERR! errno ETIMEDOUT</span><br><span class="line">npm ERR! network request to https://registry.npmjs.org/express failed, reason: connect ETIMEDOUT 104.16.18.35:443</span><br><span class="line">npm ERR! network This is a problem related to network connectivity.</span><br><span class="line">npm ERR! network In most cases you are behind a proxy or have bad network settings.</span><br><span class="line">npm ERR! network</span><br><span class="line">npm ERR! network If you are behind a proxy, please make sure that the</span><br><span class="line">npm ERR! network &#x27;proxy&#x27; config is set properly.  See: &#x27;npm help config&#x27;</span><br><span class="line"></span><br><span class="line">npm ERR! Log files were not written due to an error writing to the directory: D:\node.js\node_cache\_logs</span><br><span class="line">npm ERR! You can rerun the command with `--loglevel=verbose` to see the logs in your terminal</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>这是npm镜像问题，需要更换npm镜像，改为淘宝的镜像。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry https://registry.npm.taobao.org/</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="安装其他依赖"><a href="#安装其他依赖" class="headerlink" title="安装其他依赖"></a>安装其他依赖</h3><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm</span><br><span class="line">npm install webpack -g</span><br></pre></td></tr></table></figure></div>
+<p>此部分参考链接: <a class="link"   href="https://blog.csdn.net/weixin_52799373/article/details/123840137" >七维大脑的博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>注意有些时候需要用管理员去打开cmd，可以选择把cmd发送到桌面，然后右键以管理员权限打开即可。  </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/5.png"
+                     
+                ></p>
+<p>这样每次都是管理员身份打开了。  </p>
+<h2 id="安装-配置-Git"><a href="#安装-配置-Git" class="headerlink" title="安装+配置 Git"></a>安装+配置 Git</h2><p><a class="link"   href="https://pc.qq.com/detail/13/detail_22693.html" >点击安装Git <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<ul>
+<li>配置Git全局用户名和邮箱  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">git config --global user.name &quot;Your Name&quot;</span><br><span class="line">git config --global user.email &quot;your-email@example.com&quot;</span><br></pre></td></tr></table></figure></div></li>
+<li>添加 SSH Key到GitHub账号<br>  首先生成SSH Key  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;邮箱地址&quot;</span><br></pre></td></tr></table></figure></div>
+  生成后，会给出地址的，一般是在 C:&#x2F;user&#x2F;用户名&#x2F;.ssh&#x2F;id_rsa.pub<br>  复制后，去github绑定<br>  点击头像 -&gt; settings<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/6.png"
+                     
+                ><br>  检测是否成功  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure></div>
+  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/7.png"
+                     
+                ></li>
+</ul>
+<h1 id="创建博客项目"><a href="#创建博客项目" class="headerlink" title="创建博客项目"></a>创建博客项目</h1><h2 id="Github创建仓库"><a href="#Github创建仓库" class="headerlink" title="Github创建仓库"></a>Github创建仓库</h2><p>首页有一个new，点击即可新建<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/8.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/9.png"
+                     
+                >  </p>
+<h2 id="本地仓库创建"><a href="#本地仓库创建" class="headerlink" title="本地仓库创建"></a>本地仓库创建</h2><p>首先去D盘创建一个文件夹，把读写权限打开，否则后期会有权限问题出现。<br>新建文件夹blog，右键点击属性 -&gt; 安全，把user权限打开<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/10.png"
+                     
+                ></p>
+<h2 id="本地访问博客"><a href="#本地访问博客" class="headerlink" title="本地访问博客"></a>本地访问博客</h2><p>在blog文件夹 右键 -&gt; 显示更多选项 -&gt; git bash<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/11.png"
+                     
+                ></p>
+<p>下一步是安装hexo<br><code>npm install -g hexo-cli</code><br>安装后，可以使用 <code>hexo -v</code>查看是否安装成功，若安装不成功，可以在评论区留言。<br>接下来咱们先看一下hexo的指令，这样才会操作。<a class="link"   href="https://hexo.io/zh-cn/docs/commands.html" >hexo指令 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>首先是新建一个网站 + 在本地运行</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo init # 默认在当前文件夹新建一个网站</span><br><span class="line">hexo s # 启动访问，默认在http://localhost:4000/</span><br></pre></td></tr></table></figure></div>
+<p>注意: hexo init初始化时，文件夹必须为空！！！<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/12.png"
+                     
+                ></p>
+<p>git bash 里面 ctrl + c关闭服务<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/13.png"
+                     
+                ></p>
+<h1 id="部署个人博客"><a href="#部署个人博客" class="headerlink" title="部署个人博客"></a>部署个人博客</h1><p>部署个人博客的话，咱们直接跟着官网走即可 <a class="link"   href="https://hexo.io/zh-cn/docs/one-command-deployment.html" >部署 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/14.png"
+                     
+                >  </p>
+<p>咱们选择的部署插件是git首先安装插件，并更改配置文件<br><code>npm install hexo-deployer-git --save</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/16.png"
+                     
+                ><br>修改配置文件<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/15.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/17.png"
+                     
+                ><br>接下来两行命令就可以创建出自己的博客网站了。  </p>
+<pre><code>hexo g #生成静态文件
+hexo d #部署网站
+</code></pre>
+<p>此时GitHub仓库已经有刚才生成的静态文件了，而且博客网站已经可以访问了。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/18.png"
+                     
+                ><br>博客地址<br><code>https://username.github.io</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../img/build_your_blog/19.png"
+                     
+                ><br>这样就部署好网站了，接下来开始配置自己的网站了。</p>
+<h1 id="根据个人喜好修改配置"><a href="#根据个人喜好修改配置" class="headerlink" title="根据个人喜好修改配置"></a>根据个人喜好修改配置</h1><p>hexo提供了好多主题，大家可以根据自己喜欢去选择一个合适主题，跟着主题文档去修改即可。<a class="link"   href="https://hexo.io/themes/" >theme <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>在安装过程中可能会遇到一些报错，大家不用慌，大部分是因为网络原因导致的，耐心尝试即可！<br>注意：有什么不会的查hexo官方文档即可，<a class="link"   href="https://hexo.io/zh-cn/docs/index.html" >hexo官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>  </p>
+]]></content>
+      <categories>
+        <category>build your blog</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>github.io</tag>
       </tags>
   </entry>
 </search>
