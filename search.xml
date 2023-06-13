@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Deep_Learning_data_preprocess</title>
-    <url>/post/deep_learning_data_perprocess.html</url>
+    <title>Deep_Learning_data_operation</title>
+    <url>/post/deep_learning_data_operation.html</url>
     <content><![CDATA[<h1 id="什么是深度学习"><a href="#什么是深度学习" class="headerlink" title="什么是深度学习"></a>什么是深度学习</h1><blockquote>
 <p>深度学习(DL, Deep Learning)是机器学习(ML, Machine Learning)领域中一个新的研究方向，它被引入机器学习使其更接近于最初的目标——人工智能(AI, Artificial Intelligence)。 深度学习是学习样本数据的内在规律和表示层次，这些学习过程中获得的信息对诸如文字，图像和声音等数据的解释有很大的帮助。它的最终目标是让机器能够像人一样具有分析学习能力，能够识别文字、图像和声音等数据</p>
 </blockquote>
@@ -10,7 +10,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/1.png"
+                     data-src="/../img/deep_learning_data_operation/1.png"
                       alt="AI地图"
                 >  </p>
 <p>x轴表示的是人工智能领域中的三个主流方法：符号学、概率模型和机器学习。<br>y轴表示的是人工智能的四个核心任务：感知、推理、知识和规划。</p>
@@ -33,14 +33,14 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/2.png"
+                     data-src="/../img/deep_learning_data_operation/2.png"
                      
                 >  </p>
 <p>还可以跳着访问，隔几行或者隔几列进行访问。[x1:x2:n,y1:y2:m]表示 x1 ~ x2 -1行隔n行、y1~y2 -1隔 m列的元素。  </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/3.png"
+                     data-src="/../img/deep_learning_data_operation/3.png"
                      
                 >  </p>
 <h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>可以使用arange创建一个行向量，默认从0开始的前 n 个整数，也可以指定创建类型为浮点型。张量里面的每一个值都叫张量的元素。  </p>
@@ -48,7 +48,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/4.png"
+                     data-src="/../img/deep_learning_data_operation/4.png"
                      
                 > </p>
 <p>可以通过张量的 shape 属性来访问张量的形状</p>
@@ -56,7 +56,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/5.png"
+                     data-src="/../img/deep_learning_data_operation/5.png"
                      
                 >  </p>
 <p>如果只想知道张量中元素的总数，可以检查它的大小</p>
@@ -64,7 +64,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/6.png"
+                     data-src="/../img/deep_learning_data_operation/6.png"
                      
                 >  </p>
 <p>如果想改变张量的形状而不改变元素数量和元素值，可以调用reshape函数</p>
@@ -72,17 +72,17 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/7.png"
+                     data-src="/../img/deep_learning_data_operation/7.png"
                      
                 ><br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/8.png"
+                     data-src="/../img/deep_learning_data_operation/8.png"
                      
                 ><br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/9.png"
+                     data-src="/../img/deep_learning_data_operation/9.png"
                      
                 ></p>
 <p>有时，我们希望使用全0、全1、其他常量，或者从特定分布中随机采样的数字来初始化矩阵。</p>
@@ -90,21 +90,21 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/10.png"
+                     data-src="/../img/deep_learning_data_operation/10.png"
                      
                 ></p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">torch.ones((2, 3, 4))</span><br></pre></td></tr></table></figure></div>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/11.png"
+                     data-src="/../img/deep_learning_data_operation/11.png"
                      
                 ></p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">torch.randn((2, 3, 4))</span><br></pre></td></tr></table></figure></div>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/12.png"
+                     data-src="/../img/deep_learning_data_operation/12.png"
                      
                 ></p>
 <p>通过提供包含数值的Python列表（或嵌套列表），来为所需张量中的每个元素赋予确定值.</p>
@@ -112,7 +112,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/13.png"
+                     data-src="/../img/deep_learning_data_operation/13.png"
                      
                 ></p>
 <h2 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h2><p>对于任意具有相同形状的张量， 常见的标准算术运算符（+、-、*、&#x2F;和**）都可以被升级为按元素运算。 我们可以在同一形状的任意两个张量上调用按元素操作。</p>
@@ -120,7 +120,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/14.png"
+                     data-src="/../img/deep_learning_data_operation/14.png"
                      
                 ></p>
 <p>也可以进行求幂这样的一元运算符。</p>
@@ -128,7 +128,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/15.png"
+                     data-src="/../img/deep_learning_data_operation/15.png"
                      
                 ></p>
 <p>除了按元素计算外，我们还可以执行线性代数运算，包括向量点积和矩阵乘法，后面再说！！！<br>我们也可以把多个张量连结（concatenate）在一起， 把它们端对端地叠起来形成一个更大的张量。</p>
@@ -136,19 +136,19 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/16.png"
+                     data-src="/../img/deep_learning_data_operation/16.png"
                      
                 ></p>
 <p>还可以通过 &#x3D;&#x3D; 运算符来构建二元张量。当两个对应元素相等时，为true；反之为false<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/17.png"
+                     data-src="/../img/deep_learning_data_operation/17.png"
                      
                 ></p>
 <p>对张量中的所有元素进行求和，会产生一个单元素张量。<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/18.png"
+                     data-src="/../img/deep_learning_data_operation/18.png"
                      
                 ></p>
 <h2 id="广播机制"><a href="#广播机制" class="headerlink" title="广播机制"></a>广播机制</h2><p>前面是对形状相同的张量进行计算，下面看看形状不同的张量是否可以进行计算。首先来了解一下广播的概念。<br>广播：对不同形状的张量进行数学运算。<br>看来咱们可以通过广播的方式来对形状不同的张量进行计算，但是需要满足下面的条件。</p>
@@ -158,7 +158,7 @@
 <img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/19.png"
+                     data-src="/../img/deep_learning_data_operation/19.png"
                      
                 ></li>
 </ul>
@@ -168,7 +168,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/20.png"
+                     data-src="/../img/deep_learning_data_operation/20.png"
                      
                 ></p>
 <p>如果某些值后面不会用到，直接对该值进行操作即可</p>
@@ -176,7 +176,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/21.png"
+                     data-src="/../img/deep_learning_data_operation/21.png"
                      
                 ></p>
 <h2 id="转化为其他py对象"><a href="#转化为其他py对象" class="headerlink" title="转化为其他py对象"></a>转化为其他py对象</h2><p>torch张量和numpy数组将共享它们的底层内存，就地操作更改一个张量也会同时更改另一个张量。</p>
@@ -184,7 +184,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/22.png"
+                     data-src="/../img/deep_learning_data_operation/22.png"
                      
                 ></p>
 <p>要将大小为1的张量转换为Python标量，我们可以调用item函数或Python的内置函数。</p>
@@ -192,7 +192,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../img/deep_learning_data_preprocess/23.png"
+                     data-src="/../img/deep_learning_data_operation/23.png"
                      
                 ><br><strong>参考链接：</strong><a class="link"   href="https://zh-v2.d2l.ai/chapter_preliminaries/ndarray.html" >数据操作 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 ]]></content>
@@ -202,7 +202,7 @@
       <tags>
         <tag>Deep_Learning</tag>
         <tag>AI</tag>
-        <tag>Data_Preprocess</tag>
+        <tag>Data_operation</tag>
         <tag>Preliminary_knowledge</tag>
       </tags>
   </entry>
