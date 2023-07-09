@@ -81,6 +81,64 @@ batch_size个下标（不一定，有可能 i + batch_size越界，然后取num_
       </tags>
   </entry>
   <entry>
+    <title>Deep Learning Preliminary knowledge(2):Data Preprocess</title>
+    <url>/post/data_preprocess.html</url>
+    <content><![CDATA[<h1 id="介绍">介绍</h1>
+<p>数据预处理是说
+现在有现实世界的数据，怎么把它读取进来，通过机器学习的方法能够处理。
+下面讲解一下如何使用pandas预处理原始数据，并将原始数据转化为张量的步骤。</p>
+<h1 id="读取数据集">读取数据集</h1>
+<p>由于咱们没有数据集，所以咱们先手动创建一个数据集，并存储在CSV（逗号分隔值）文件
+../data/house_tiny.csv中 来进行下面操作，如有数据集可越过此步骤。
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">os.makedirs(os.path.join(<span class="string">&#x27;..&#x27;</span>, <span class="string">&#x27;data&#x27;</span>), exist_ok=<span class="literal">True</span>)</span><br><span class="line">data_file = os.path.join(<span class="string">&#x27;..&#x27;</span>, <span class="string">&#x27;data&#x27;</span>, <span class="string">&#x27;house_tiny.csv&#x27;</span>)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(data_file, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">&#x27;NumRooms,Alley,Price\n&#x27;</span>)  <span class="comment"># 列名</span></span><br><span class="line">    f.write(<span class="string">&#x27;NA,Pave,127500\n&#x27;</span>)  <span class="comment"># 每行表示一个数据样本</span></span><br><span class="line">    f.write(<span class="string">&#x27;2,NA,106000\n&#x27;</span>)</span><br><span class="line">    f.write(<span class="string">&#x27;4,NA,178100\n&#x27;</span>)</span><br><span class="line">    f.write(<span class="string">&#x27;NA,NA,140000\n&#x27;</span>)</span><br></pre></td></tr></table></figure></div>
+要从创建的CSV文件中加载原始数据集，我们导入pandas包并调用read_csv函数
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 如果没有安装pandas，只需取消对以下行的注释来安装pandas</span></span><br><span class="line"><span class="comment"># !pip install pandas</span></span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line">data = pd.read_csv(data_file)</span><br><span class="line">data</span><br></pre></td></tr></table></figure></div> <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/L1adG9si.png"
+                      
+                ></p>
+<h1 id="处理缺失值">处理缺失值</h1>
+<p>可以看到，"NaN"表示缺失值。为了处理缺失值，典型的方法包括插值法和删除法，
+其中插值法用一个替代值弥补缺失值，而删除法则直接忽略缺失值，所以咱们只考虑插值法。
+首先咱们先切片的方式把数据分为输入（input）、输出（output），输入为数据的前两列，输出为数据的最后一列。然后咱们把输入里面的NaN值用同一列的均值替换。
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">inputs, outputs = data.iloc[:, <span class="number">0</span>:<span class="number">2</span>], data.iloc[:, <span class="number">2</span>] <span class="comment">#前两列为input，最后一列为output</span></span><br><span class="line">inputs = inputs.fillna(inputs.mean()) <span class="comment">#把input的NaN值都替换为均值</span></span><br><span class="line"><span class="built_in">print</span>(inputs)</span><br></pre></td></tr></table></figure></div> <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/VUPs1gxe.png"
+                      
+                ></p>
+<p>但是input里面有些值不是数字怎么办呢？是字符串。咱们还需要把字符串变为数值，方便后面处理。
+首先把所有出现的不同数值（字符串等数据类型）变成一个特征，通过get_dummies函数建几类。如果之前的值是其中的一个类的话，那么那个类里面就为1，否则为0.<br />
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">inputs = pd.get_dummies(inputs, dummy_na=<span class="literal">True</span>)</span><br><span class="line"><span class="built_in">print</span>(inputs)</span><br></pre></td></tr></table></figure></div> <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/E2sTW26B.png"
+                      
+                ></p>
+<h1 id="转换为张量格式">转换为张量格式</h1>
+<p>现在所有的数据都是数值类型了，可以转换为张量格式了。 <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line">X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)</span><br><span class="line">X, y</span><br></pre></td></tr></table></figure></div>
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/J7ptW11o.png"
+                      
+                ></p>
+]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Deep Learning</tag>
+        <tag>AI</tag>
+        <tag>Data Preprocess</tag>
+        <tag>Preliminary knowledge</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linear Regression</title>
     <url>/post/Linear_Regression.html</url>
     <content><![CDATA[<h1 id="概念">概念</h1>
@@ -502,66 +560,8 @@ x2 -1行隔n行、y1~y2 -1隔 m列的元素。</p>
       <tags>
         <tag>Deep Learning</tag>
         <tag>AI</tag>
+        <tag>Preliminary knowledge</tag>
         <tag>Data_Operation</tag>
-        <tag>Preliminary knowledge</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Deep Learning Preliminary knowledge(2):Data Preprocess</title>
-    <url>/post/data_preprocess.html</url>
-    <content><![CDATA[<h1 id="介绍">介绍</h1>
-<p>数据预处理是说
-现在有现实世界的数据，怎么把它读取进来，通过机器学习的方法能够处理。
-下面讲解一下如何使用pandas预处理原始数据，并将原始数据转化为张量的步骤。</p>
-<h1 id="读取数据集">读取数据集</h1>
-<p>由于咱们没有数据集，所以咱们先手动创建一个数据集，并存储在CSV（逗号分隔值）文件
-../data/house_tiny.csv中 来进行下面操作，如有数据集可越过此步骤。
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">os.makedirs(os.path.join(<span class="string">&#x27;..&#x27;</span>, <span class="string">&#x27;data&#x27;</span>), exist_ok=<span class="literal">True</span>)</span><br><span class="line">data_file = os.path.join(<span class="string">&#x27;..&#x27;</span>, <span class="string">&#x27;data&#x27;</span>, <span class="string">&#x27;house_tiny.csv&#x27;</span>)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(data_file, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">&#x27;NumRooms,Alley,Price\n&#x27;</span>)  <span class="comment"># 列名</span></span><br><span class="line">    f.write(<span class="string">&#x27;NA,Pave,127500\n&#x27;</span>)  <span class="comment"># 每行表示一个数据样本</span></span><br><span class="line">    f.write(<span class="string">&#x27;2,NA,106000\n&#x27;</span>)</span><br><span class="line">    f.write(<span class="string">&#x27;4,NA,178100\n&#x27;</span>)</span><br><span class="line">    f.write(<span class="string">&#x27;NA,NA,140000\n&#x27;</span>)</span><br></pre></td></tr></table></figure></div>
-要从创建的CSV文件中加载原始数据集，我们导入pandas包并调用read_csv函数
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 如果没有安装pandas，只需取消对以下行的注释来安装pandas</span></span><br><span class="line"><span class="comment"># !pip install pandas</span></span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line">data = pd.read_csv(data_file)</span><br><span class="line">data</span><br></pre></td></tr></table></figure></div> <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/L1adG9si.png"
-                      
-                ></p>
-<h1 id="处理缺失值">处理缺失值</h1>
-<p>可以看到，"NaN"表示缺失值。为了处理缺失值，典型的方法包括插值法和删除法，
-其中插值法用一个替代值弥补缺失值，而删除法则直接忽略缺失值，所以咱们只考虑插值法。
-首先咱们先切片的方式把数据分为输入（input）、输出（output），输入为数据的前两列，输出为数据的最后一列。然后咱们把输入里面的NaN值用同一列的均值替换。
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">inputs, outputs = data.iloc[:, <span class="number">0</span>:<span class="number">2</span>], data.iloc[:, <span class="number">2</span>] <span class="comment">#前两列为input，最后一列为output</span></span><br><span class="line">inputs = inputs.fillna(inputs.mean()) <span class="comment">#把input的NaN值都替换为均值</span></span><br><span class="line"><span class="built_in">print</span>(inputs)</span><br></pre></td></tr></table></figure></div> <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/VUPs1gxe.png"
-                      
-                ></p>
-<p>但是input里面有些值不是数字怎么办呢？是字符串。咱们还需要把字符串变为数值，方便后面处理。
-首先把所有出现的不同数值（字符串等数据类型）变成一个特征，通过get_dummies函数建几类。如果之前的值是其中的一个类的话，那么那个类里面就为1，否则为0.<br />
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">inputs = pd.get_dummies(inputs, dummy_na=<span class="literal">True</span>)</span><br><span class="line"><span class="built_in">print</span>(inputs)</span><br></pre></td></tr></table></figure></div> <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/E2sTW26B.png"
-                      
-                ></p>
-<h1 id="转换为张量格式">转换为张量格式</h1>
-<p>现在所有的数据都是数值类型了，可以转换为张量格式了。 <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line">X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)</span><br><span class="line">X, y</span><br></pre></td></tr></table></figure></div>
-<img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/J7ptW11o.png"
-                      
-                ></p>
-]]></content>
-      <categories>
-        <category>Deep Learning</category>
-      </categories>
-      <tags>
-        <tag>Deep Learning</tag>
-        <tag>AI</tag>
-        <tag>Preliminary knowledge</tag>
-        <tag>Data Preprocess</tag>
       </tags>
   </entry>
   <entry>
@@ -1045,222 +1045,6 @@ up进行注册。</p>
       </tags>
   </entry>
   <entry>
-    <title>搭建专属于自己的个人博客</title>
-    <url>/post/build_your_blog.html</url>
-    <content><![CDATA[<h1 id="前言">前言</h1>
-<p>你是否想拥有属于自己的博客，但是又由于不会前端知识、web框架等等 或者
-花费时间多
-而苦恼，不用担心。接下来跟着这篇文章，你将花费不到20分钟时间拥有自己的博客！！！</p>
-<h1 id="原理">原理</h1>
-<p>首先，来讲解一下原理。 咱们主要是通过hexo + GitHub Pages
-来搭建自己的博客的。 下面是 GitHub Pages、hexo的官方说明。 &gt;GitHub
-Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和
-JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。</p>
-<blockquote>
-<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用
-Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
-</blockquote>
-<p>刚好hexo又提供了一键部署的功能，可以把网站一键部署到GitHub
-Pages。</p>
-<h1 id="准备工作">准备工作</h1>
-<h2 id="node.js-安装-配置">node.js 安装 + 配置</h2>
-<h3 id="安装">安装</h3>
-<p><a class="link" 
- href="https://pc.qq.com/detail/5/detail_24845.html" >点击即可安装node.js <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br />
-腾讯软件中心下载的比较快，建议在D盘创建一个node.js文件夹。 <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/9ou0NO9k.png"
-                     
-alt="node.js文件夹内容" 
-                > 打开电脑终端，输入 node -v、npm
--v两个命令查看是否安装成功。 <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/f2c0CUoM.png"
-                     
-alt="检查是否安装成功" 
-                ></p>
-<h3 id="配置">配置</h3>
-<ul>
-<li><p>在node.js文件夹下创建 node_global、node_cache文件夹,设置 npm
-的全局安装路径和缓存路径. <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set prefix &quot;D:\nodejs\node_global&quot;</span><br><span class="line">npm config set cache &quot;D:\nodejs\node_cache&quot;</span><br></pre></td></tr></table></figure></div></p></li>
-<li><p>添加环境变量<br />
-win11系统下添加变量步骤: 设置 -&gt; 系统 -&gt; 系统信息 -&gt;
-高级系统设置 -&gt; 环境变量<br />
-1、添加系统变量</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/HVxM0eWK.png"
-                      
-                ><br />
-<img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/bYt5c7fu.png"
-                      
-                ></p>
-<p>2、添加环境变量</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/mCc790bt.png"
-                      
-                ></p></li>
-</ul>
-<h3 id="测试">测试</h3>
-<p>接下来咱们测试一下是否配置成功。</p>
-<p><code>npm install express -g</code></p>
-<p>如果出现下面报错的话 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install express -g</span><br><span class="line">npm ERR! code ETIMEDOUT</span><br><span class="line">npm ERR! syscall connect</span><br><span class="line">npm ERR! errno ETIMEDOUT</span><br><span class="line">npm ERR! network request to https://registry.npmjs.org/express failed, reason: connect ETIMEDOUT 104.16.18.35:443</span><br><span class="line">npm ERR! network This is a problem related to network connectivity.</span><br><span class="line">npm ERR! network In most cases you are behind a proxy or have bad network settings.</span><br><span class="line">npm ERR! network</span><br><span class="line">npm ERR! network If you are behind a proxy, please make sure that the</span><br><span class="line">npm ERR! network &#x27;proxy&#x27; config is set properly.  See: &#x27;npm help config&#x27;</span><br><span class="line"></span><br><span class="line">npm ERR! Log files were not written due to an error writing to the directory: D:\node.js\node_cache\_logs</span><br><span class="line">npm ERR! You can rerun the command with `--loglevel=verbose` to see the logs in your terminal</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-这是npm镜像问题，需要更换npm镜像，改为淘宝的镜像。 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry https://registry.npm.taobao.org/</span><br></pre></td></tr></table></figure></div></p>
-<h3 id="安装其他依赖">安装其他依赖</h3>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm</span><br><span class="line">npm install webpack -g</span><br></pre></td></tr></table></figure></div>
-<p>此部分参考链接: <a class="link" 
- href="https://blog.csdn.net/weixin_52799373/article/details/123840137" >七维大脑的博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br />
-注意有些时候需要用管理员去打开cmd，可以选择把cmd发送到桌面，然后右键以管理员权限打开即可。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/YNlB1psp.png"
-                      
-                ></p>
-<p>这样每次都是管理员身份打开了。</p>
-<h2 id="安装配置-git">安装+配置 Git</h2>
-<p><a class="link" 
- href="https://pc.qq.com/detail/13/detail_22693.html" >点击安装Git <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> *
-配置Git全局用户名和邮箱 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">git config --global user.name &quot;Your Name&quot;</span><br><span class="line">git config --global user.email &quot;your-email@example.com&quot;</span><br></pre></td></tr></table></figure></div> * 添加 SSH Key到GitHub账号
-首先生成SSH Key <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;邮箱地址&quot;</span><br></pre></td></tr></table></figure></div> 生成后，会给出地址的，一般是在
-C:/user/用户名/.ssh/id_rsa.pub 复制后，去github绑定 点击头像 -&gt;
-settings <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/dWDypcVl.png"
-                      
-                ></p>
-<pre><code>检测是否成功
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure></div>
-![](https://img1.imgtp.com/2023/06/25/SuO8j4gu.png)</code></pre>
-<h1 id="创建博客项目">创建博客项目</h1>
-<h2 id="github创建仓库">Github创建仓库</h2>
-<p>首页有一个new，点击即可新建 <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/vQWlrSpL.png"
-                      
-                ><br />
-<img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/aEhvVNsX.png"
-                      
-                ></p>
-<h2 id="本地仓库创建">本地仓库创建</h2>
-<p>首先去D盘创建一个文件夹，把读写权限打开，否则后期会有权限问题出现。
-新建文件夹blog，右键点击属性 -&gt; 安全，把user权限打开 <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/i1ifjzhF.png"
-                      
-                ></p>
-<h2 id="本地访问博客">本地访问博客</h2>
-<p>在blog文件夹 右键 -&gt; 显示更多选项 -&gt; git bash <img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/vKuCSKEv.png"
-                      
-                ></p>
-<p>下一步是安装hexo <code>npm install -g hexo-cli</code>
-安装后，可以使用
-<code>hexo -v</code>查看是否安装成功，若安装不成功，可以在评论区留言。
-接下来咱们先看一下hexo的指令，这样才会操作。<a class="link" 
- href="https://hexo.io/zh-cn/docs/commands.html" >hexo指令 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br />
-首先是新建一个网站 + 在本地运行 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo init # 默认在当前文件夹新建一个网站</span><br><span class="line">hexo s # 启动访问，默认在http://localhost:4000/</span><br></pre></td></tr></table></figure></div> 注意: hexo
-init初始化时，文件夹必须为空！！！</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/4QjJm67U.png"
-                      
-                ></p>
-<p>git bash 里面 ctrl + c关闭服务</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/KAClJWBi.png"
-                      
-                ></p>
-<h1 id="部署个人博客">部署个人博客</h1>
-<p>部署个人博客的话，咱们直接跟着官网走即可 <a class="link" 
- href="https://hexo.io/zh-cn/docs/one-command-deployment.html" >部署 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/f5gIPRsl.png"
-                      
-                ></p>
-<p>咱们选择的部署插件是git首先安装插件，并更改配置文件<br />
-<code>npm install hexo-deployer-git --save</code></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/NpjCzgUN.png"
-                      
-                ></p>
-<p>修改配置文件</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/3BfvRDSM.png"
-                      
-                ></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/DcNUvb3Y.png"
-                      
-                ></p>
-<p>接下来两行命令就可以创建出自己的博客网站了。</p>
-<pre><code>hexo g #生成静态文件
-hexo d #部署网站</code></pre>
-<p>此时GitHub仓库已经有刚才生成的静态文件了，而且博客网站已经可以访问了。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/G37hqTNq.png"
-                      
-                ><br />
-博客地址 <code>https://username.github.io</code><br />
-<img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://img1.imgtp.com/2023/06/25/PGwzYWD6.png"
-                      
-                ><br />
-这样就部署好网站了，接下来开始配置自己的网站了。</p>
-<h1 id="根据个人喜好修改配置">根据个人喜好修改配置</h1>
-<p>hexo提供了好多主题，大家可以根据自己喜欢去选择一个合适主题，跟着主题文档去修改即可。<a class="link" 
- href="https://hexo.io/themes/" >theme <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h1 id="写在最后">写在最后</h1>
-<p>在安装过程中可能会遇到一些报错，大家不用慌，大部分是因为网络原因导致的，耐心尝试即可！
-注意：有什么不会的查hexo官方文档即可，<a class="link" 
- href="https://hexo.io/zh-cn/docs/index.html" >hexo官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-]]></content>
-      <categories>
-        <category>build your blog</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-        <tag>github.io</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Softmax Regression</title>
     <url>/post/Softmax_Regression.html</url>
     <content><![CDATA[<h1 id="前言">前言</h1>
@@ -1591,6 +1375,222 @@ Softmax运算在CrossEntropyLoss里面进行运算。 <div class="highlight-cont
         <tag>Deep Learning</tag>
         <tag>AI</tag>
         <tag>Softmax Regression</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>搭建专属于自己的个人博客</title>
+    <url>/post/build_your_blog.html</url>
+    <content><![CDATA[<h1 id="前言">前言</h1>
+<p>你是否想拥有属于自己的博客，但是又由于不会前端知识、web框架等等 或者
+花费时间多
+而苦恼，不用担心。接下来跟着这篇文章，你将花费不到20分钟时间拥有自己的博客！！！</p>
+<h1 id="原理">原理</h1>
+<p>首先，来讲解一下原理。 咱们主要是通过hexo + GitHub Pages
+来搭建自己的博客的。 下面是 GitHub Pages、hexo的官方说明。 &gt;GitHub
+Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和
+JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。</p>
+<blockquote>
+<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用
+Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
+</blockquote>
+<p>刚好hexo又提供了一键部署的功能，可以把网站一键部署到GitHub
+Pages。</p>
+<h1 id="准备工作">准备工作</h1>
+<h2 id="node.js-安装-配置">node.js 安装 + 配置</h2>
+<h3 id="安装">安装</h3>
+<p><a class="link" 
+ href="https://pc.qq.com/detail/5/detail_24845.html" >点击即可安装node.js <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br />
+腾讯软件中心下载的比较快，建议在D盘创建一个node.js文件夹。 <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/9ou0NO9k.png"
+                     
+alt="node.js文件夹内容" 
+                > 打开电脑终端，输入 node -v、npm
+-v两个命令查看是否安装成功。 <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/f2c0CUoM.png"
+                     
+alt="检查是否安装成功" 
+                ></p>
+<h3 id="配置">配置</h3>
+<ul>
+<li><p>在node.js文件夹下创建 node_global、node_cache文件夹,设置 npm
+的全局安装路径和缓存路径. <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set prefix &quot;D:\nodejs\node_global&quot;</span><br><span class="line">npm config set cache &quot;D:\nodejs\node_cache&quot;</span><br></pre></td></tr></table></figure></div></p></li>
+<li><p>添加环境变量<br />
+win11系统下添加变量步骤: 设置 -&gt; 系统 -&gt; 系统信息 -&gt;
+高级系统设置 -&gt; 环境变量<br />
+1、添加系统变量</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/HVxM0eWK.png"
+                      
+                ><br />
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/bYt5c7fu.png"
+                      
+                ></p>
+<p>2、添加环境变量</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/mCc790bt.png"
+                      
+                ></p></li>
+</ul>
+<h3 id="测试">测试</h3>
+<p>接下来咱们测试一下是否配置成功。</p>
+<p><code>npm install express -g</code></p>
+<p>如果出现下面报错的话 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install express -g</span><br><span class="line">npm ERR! code ETIMEDOUT</span><br><span class="line">npm ERR! syscall connect</span><br><span class="line">npm ERR! errno ETIMEDOUT</span><br><span class="line">npm ERR! network request to https://registry.npmjs.org/express failed, reason: connect ETIMEDOUT 104.16.18.35:443</span><br><span class="line">npm ERR! network This is a problem related to network connectivity.</span><br><span class="line">npm ERR! network In most cases you are behind a proxy or have bad network settings.</span><br><span class="line">npm ERR! network</span><br><span class="line">npm ERR! network If you are behind a proxy, please make sure that the</span><br><span class="line">npm ERR! network &#x27;proxy&#x27; config is set properly.  See: &#x27;npm help config&#x27;</span><br><span class="line"></span><br><span class="line">npm ERR! Log files were not written due to an error writing to the directory: D:\node.js\node_cache\_logs</span><br><span class="line">npm ERR! You can rerun the command with `--loglevel=verbose` to see the logs in your terminal</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+这是npm镜像问题，需要更换npm镜像，改为淘宝的镜像。 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry https://registry.npm.taobao.org/</span><br></pre></td></tr></table></figure></div></p>
+<h3 id="安装其他依赖">安装其他依赖</h3>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm</span><br><span class="line">npm install webpack -g</span><br></pre></td></tr></table></figure></div>
+<p>此部分参考链接: <a class="link" 
+ href="https://blog.csdn.net/weixin_52799373/article/details/123840137" >七维大脑的博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br />
+注意有些时候需要用管理员去打开cmd，可以选择把cmd发送到桌面，然后右键以管理员权限打开即可。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/YNlB1psp.png"
+                      
+                ></p>
+<p>这样每次都是管理员身份打开了。</p>
+<h2 id="安装配置-git">安装+配置 Git</h2>
+<p><a class="link" 
+ href="https://pc.qq.com/detail/13/detail_22693.html" >点击安装Git <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> *
+配置Git全局用户名和邮箱 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">git config --global user.name &quot;Your Name&quot;</span><br><span class="line">git config --global user.email &quot;your-email@example.com&quot;</span><br></pre></td></tr></table></figure></div> * 添加 SSH Key到GitHub账号
+首先生成SSH Key <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;邮箱地址&quot;</span><br></pre></td></tr></table></figure></div> 生成后，会给出地址的，一般是在
+C:/user/用户名/.ssh/id_rsa.pub 复制后，去github绑定 点击头像 -&gt;
+settings <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/dWDypcVl.png"
+                      
+                ></p>
+<pre><code>检测是否成功
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure></div>
+![](https://img1.imgtp.com/2023/06/25/SuO8j4gu.png)</code></pre>
+<h1 id="创建博客项目">创建博客项目</h1>
+<h2 id="github创建仓库">Github创建仓库</h2>
+<p>首页有一个new，点击即可新建 <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/vQWlrSpL.png"
+                      
+                ><br />
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/aEhvVNsX.png"
+                      
+                ></p>
+<h2 id="本地仓库创建">本地仓库创建</h2>
+<p>首先去D盘创建一个文件夹，把读写权限打开，否则后期会有权限问题出现。
+新建文件夹blog，右键点击属性 -&gt; 安全，把user权限打开 <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/i1ifjzhF.png"
+                      
+                ></p>
+<h2 id="本地访问博客">本地访问博客</h2>
+<p>在blog文件夹 右键 -&gt; 显示更多选项 -&gt; git bash <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/vKuCSKEv.png"
+                      
+                ></p>
+<p>下一步是安装hexo <code>npm install -g hexo-cli</code>
+安装后，可以使用
+<code>hexo -v</code>查看是否安装成功，若安装不成功，可以在评论区留言。
+接下来咱们先看一下hexo的指令，这样才会操作。<a class="link" 
+ href="https://hexo.io/zh-cn/docs/commands.html" >hexo指令 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br />
+首先是新建一个网站 + 在本地运行 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo init # 默认在当前文件夹新建一个网站</span><br><span class="line">hexo s # 启动访问，默认在http://localhost:4000/</span><br></pre></td></tr></table></figure></div> 注意: hexo
+init初始化时，文件夹必须为空！！！</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/4QjJm67U.png"
+                      
+                ></p>
+<p>git bash 里面 ctrl + c关闭服务</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/KAClJWBi.png"
+                      
+                ></p>
+<h1 id="部署个人博客">部署个人博客</h1>
+<p>部署个人博客的话，咱们直接跟着官网走即可 <a class="link" 
+ href="https://hexo.io/zh-cn/docs/one-command-deployment.html" >部署 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/f5gIPRsl.png"
+                      
+                ></p>
+<p>咱们选择的部署插件是git首先安装插件，并更改配置文件<br />
+<code>npm install hexo-deployer-git --save</code></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/NpjCzgUN.png"
+                      
+                ></p>
+<p>修改配置文件</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/3BfvRDSM.png"
+                      
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/DcNUvb3Y.png"
+                      
+                ></p>
+<p>接下来两行命令就可以创建出自己的博客网站了。</p>
+<pre><code>hexo g #生成静态文件
+hexo d #部署网站</code></pre>
+<p>此时GitHub仓库已经有刚才生成的静态文件了，而且博客网站已经可以访问了。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/G37hqTNq.png"
+                      
+                ><br />
+博客地址 <code>https://username.github.io</code><br />
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img1.imgtp.com/2023/06/25/PGwzYWD6.png"
+                      
+                ><br />
+这样就部署好网站了，接下来开始配置自己的网站了。</p>
+<h1 id="根据个人喜好修改配置">根据个人喜好修改配置</h1>
+<p>hexo提供了好多主题，大家可以根据自己喜欢去选择一个合适主题，跟着主题文档去修改即可。<a class="link" 
+ href="https://hexo.io/themes/" >theme <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="写在最后">写在最后</h1>
+<p>在安装过程中可能会遇到一些报错，大家不用慌，大部分是因为网络原因导致的，耐心尝试即可！
+注意：有什么不会的查hexo官方文档即可，<a class="link" 
+ href="https://hexo.io/zh-cn/docs/index.html" >hexo官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <categories>
+        <category>build your blog</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>github.io</tag>
       </tags>
   </entry>
 </search>
