@@ -1593,4 +1593,18 @@ hexo d #部署网站</code></pre>
         <tag>github.io</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Multilayer_Perceptrons</title>
+    <url>/post/multilayer_perceptrons.html</url>
+    <content><![CDATA[
+]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Deep Learning</tag>
+        <tag>AI</tag>
+        <tag>MLP</tag>
+      </tags>
+  </entry>
 </search>
