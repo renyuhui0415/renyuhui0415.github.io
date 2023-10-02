@@ -1949,8 +1949,8 @@ net(X)的时候，会调用
 <p>所谓智能，就是能够识别垃圾类别，放到对应的垃圾桶里面。核心是目标检测算法，这里采用的是yolov5。接下来讲一下配置环境后，运行yolov5测试所遇到的报错，帮助大家避雷。</p>
 <h1 id="配置环境">配置环境</h1>
 <p>配置环境，我没有什么可说的，网上教程一抓一大把，这里我推荐的是 <a class="link" 
- href="https://blog.csdn.net/qq_44697805/article/details/107702939" >史上最详细yolov5环境配置搭建+配置所需文件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>.
-需要注意的是，看好自己电脑是否有英伟达显卡，没有的话，pytorch需要按照CPU版本的。</p>
+ href="https://blog.csdn.net/qq_44697805/article/details/107702939" >史上最详细yolov5环境配置搭建+配置所需文件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>.</p>
+<p>需要注意的是，看好自己电脑是否有英伟达显卡，没有的话，pytorch需要按照CPU版本的。</p>
 <h1 id="运行yolo报错">运行yolo报错</h1>
 <h2 id="本人环境">本人环境</h2>
 <ul>
@@ -1984,7 +1984,7 @@ Can't get attribute 'SPPF' on &lt;module 'models.common' from
 <p>原来代码为</p>
 <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">response = requests.get(<span class="string">f&#x27;https://api.github.com/repos/<span class="subst">&#123;repo&#125;</span>/releases/lastest&#x27;</span>).json()  <span class="comment"># github api</span></span><br></pre></td></tr></table></figure></div>
 <p>可以看到，默认获取是最新版本的，咱们需要改为v5的即可</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">response = requests.et(<span class="string">f&#x27;https://api.github.com/repos/<span class="subst">&#123;repo&#125;</span>/releases/tag/v5.0&#x27;</span>).json()  <span class="comment"># github api</span></span><br></pre></td></tr></table></figure></div>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">response = requests.get(<span class="string">f&#x27;https://api.github.com/repos/<span class="subst">&#123;repo&#125;</span>/releases/tag/v5.0&#x27;</span>).json()  <span class="comment"># github api</span></span><br></pre></td></tr></table></figure></div>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
