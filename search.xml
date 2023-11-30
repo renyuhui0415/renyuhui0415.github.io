@@ -2210,4 +2210,178 @@ ROS Noetic <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p
         <tag>Study Notes</tag>
       </tags>
   </entry>
+  <entry>
+    <title>ROS学习笔记（2）：快速体验ROS</title>
+    <url>/post/ros_study_notes_2-ros_quick_experience.html</url>
+    <content><![CDATA[<p>咱们每次学习新的语言第一步都是hello
+word。现在让我们在ros上实现一下。<br />
+ROS中涉及的编程语言以C++和python为主，虽然实现语言不同，但是流程类似。详细流程如下</p>
+<ol type="1">
+<li>先创建一个工作空间</li>
+<li>再创建一个功能包</li>
+<li>编辑源文件</li>
+<li>编辑配置文件</li>
+<li>编译并执行</li>
+</ol>
+<h1 id="创建工作空间并初始化">创建工作空间并初始化</h1>
+<p>首先创建一个工作空间及一个src子目录，然后进入工作空间，调用
+catkin_make命令编译。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">把 ros_study 替换为 自己想起的名字,就是一个工作空间的名字而已，随便起</span></span><br><span class="line">mkdir -p ros_study/src</span><br><span class="line">cd ros_study</span><br><span class="line">catkin_make</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301923150.png"
+                      
+                ></p>
+<p>编译后会发现多了两个子目录，目前不需要管，咱们继续下一步。</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301943876.png"
+                      
+                ></p>
+<h1 id="创建ros包并添加依赖">创建ROS包并添加依赖</h1>
+<p>接下来进入src子目录，创建ROS包，并添加该ROS包需要用到的依赖。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">注意：目前所处位置为工作空间（ros_study）内</span></span><br><span class="line">cd src</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">catkin_create_pkg + 包名 + 依赖</span></span><br><span class="line">catkin_create_pkg helloworld roscpp rospy std_msgs</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301926315.png"
+                      
+                ></p>
+<p>然后src子目录就会多出一些文件。</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301943832.png"
+                      
+                ></p>
+<h1 id="c版hello-world">C++版hello world</h1>
+<h2 id="编辑源文件">编辑源文件</h2>
+<p>前面都是准备工作，接下来开始写代码了。<br />
+首先在
+ros_study/src/helloworld/src下创建一个cpp文件，可以使用vim创建，或者touch。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">已经安装过vim的，可以跳过这一步</span></span><br><span class="line">sudo apt-get install vim</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">注意此时路径为 ros_study/src/helloworld/src</span></span><br><span class="line">vim helloworld.cpp</span><br></pre></td></tr></table></figure></div>
+<p>文件内容如下</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;ros/ros.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//ROS节点初始化</span></span><br><span class="line">    ros::<span class="built_in">init</span>(argc,argv,<span class="string">&quot;hello&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建ROS节点</span></span><br><span class="line">    ros::NodeHandle n;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//控制台输出 hello world</span></span><br><span class="line">    <span class="built_in">ROS_INFO</span>(<span class="string">&quot;hello world!&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>在vim中，:进入命令行模式，输入保存并退出。不熟悉使用vim的同学，请自行百度用法，或者使用ubuntu自带的文本编辑器。</p>
+<h2 id="修改cmakelist.txt文件">修改Cmakelist.txt文件</h2>
+<p>路径：ros_study/src/helloworld</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">vim CMakeLists.txt</span><br></pre></td></tr></table></figure></div>
+<p><strong>修改136行的内容</strong><br />
+把注释去掉，${PROJECT_NAME}_node
+修改为任意内容（你想要起的名字）；另外把src/后面的文件名修改为自己前面创建的cpp文件名，不然会报错</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">add_executable(begin src/helloworld.cpp)</span><br></pre></td></tr></table></figure></div>
+<p>同时把149～151行的注释去掉，${PROJECT_NAME}_node替换为上面的名字</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">我前面起的名字为begin，这里替换为begin</span></span><br><span class="line">target_link_libraries(begin</span><br><span class="line"><span class="meta prompt_">   $</span><span class="language-bash">&#123;catkin_LIBRARIES&#125;</span></span><br><span class="line"> )</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301945991.png"
+                      
+                ></p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301945442.png"
+                      
+                ></p>
+<h2 id="进入工作空间目录并编译">进入工作空间目录并编译</h2>
+<p>首先返回工作目录</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/ros_study</span><br></pre></td></tr></table></figure></div>
+<p>然后开始编译</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">catkin_make</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301946681.png"
+                      
+                ></p>
+<p>这样就是编译成功了。</p>
+<h2 id="执行">执行</h2>
+<p>首先<strong>打开一个终端</strong>启动ros内核,每一次运行ros的时候都需要启动内核。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">roscore</span><br></pre></td></tr></table></figure></div>
+<p>然后在刚才那一个终端下设置环境变量(此时路径为在工作空间下)</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ./devel/setup.bash </span><br></pre></td></tr></table></figure></div>
+<p>接下来运行节点</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">rosrun helloworld begin</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">rosrun 包名 C++节点</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">包名就是创建ROS包起的名字，C++节点名就是在Cmakelist.txt 修改节点的名字</span></span><br></pre></td></tr></table></figure></div>
+<p>如下图所示，输出了 hello world! <img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301949760.png"
+                      
+                ></p>
+<p><strong>PS：前面设置了环境变量，但是只在当前终端有效，打开新的终端后就不能用了。如果想要在全部终端下使用（以后会长期使用的包），请按以下步骤操作</strong></p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">sudo vim ~/.bashrc</span><br></pre></td></tr></table></figure></div>
+<p>然后在最后一行追加</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/ros_study/devel/setup.bash #注意需要替换为自己的路径</span><br></pre></td></tr></table></figure></div>
+<p>最后重新加载一下 .bashrc</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bashrc</span><br></pre></td></tr></table></figure></div>
+<p>原来很简单，就是在我们打开一个新的终端后，会自动执行.bashrc文件内容，我们只需要把设置环境变量的内容添加到里面就可以了。</p>
+<h1 id="python版hello-world">python版hello world</h1>
+<h2 id="编辑源代码">编辑源代码</h2>
+<p><strong>注意：此时已经默认大家完成了
+创建工作空间并初始化、创建ROS包并添加依赖等步骤。</strong>
+首先在前面创建的包下创建一个 scripts子目录</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/ros_study/src/helloworld</span><br><span class="line">mkdir scripts</span><br></pre></td></tr></table></figure></div>
+<p>接下来在 scripts子目录下创建 py文件</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd scripts/</span><br><span class="line">vim helloworld.py</span><br></pre></td></tr></table></figure></div>
+<p>py文件内容如下</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#! /usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    rospy.init_node(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    rospy.loginfo(<span class="string">&quot;hello world by rospy!&quot;</span>)</span><br></pre></td></tr></table></figure></div>
+<p>保存并退出后，<strong>给py文件添加可执行权限</strong></p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">chmod +x helloworld.py</span><br></pre></td></tr></table></figure></div>
+<h2 id="修改cmakrlist.txt文件">修改Cmakrlist.txt文件</h2>
+<p>路径：ros_study/scripts</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">vim ../CMakeLists.txt</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301952133.png"
+                      
+                ></p>
+<p>把162～165行注释取消，把scripts/my_python_script修改为自己py文件路径</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301953172.png"
+                      
+                ></p>
+<p>保存并退出，回到工作空间下进行编译</p>
+<h2 id="进入工作空间目录并编译-1">进入工作空间目录并编译</h2>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/ros_study</span><br><span class="line">catkin_make</span><br></pre></td></tr></table></figure></div>
+<h2 id="执行-1">执行</h2>
+<p>首先启动ros内核，新建一个终端，输入以下命令</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">roscore</span><br></pre></td></tr></table></figure></div>
+<p>接下来在原先的终端内输入</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">此时路径为在工作空间下</span></span><br><span class="line">source ./devel/setup.bash </span><br></pre></td></tr></table></figure></div>
+<p>如果之前在.bashrc刷新环境变量的话，上一步可以省略。
+接下来运行节点。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">helloworld为包名，helloword.py为py脚本</span></span><br><span class="line">rosrun helloworld helloword.py</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202311301956304.png"
+                      
+                ></p>
+<p>声明：以上内容均为B站
+<strong>【Autolabor初级教程】ROS机器人入门</strong>视频整合而来<br />
+<a class="link" 
+ href="https://www.bilibili.com/video/BV1Ci4y1L7ZZ/?p=19&amp;vd_source=b2ed5c47320570377a286c971d07468f" >ROS机器人入门 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <tags>
+        <tag>ROS</tag>
+        <tag>Study Notes</tag>
+      </tags>
+  </entry>
 </search>
