@@ -3012,4 +3012,345 @@ echo命令报如下错误的时候，需要进入工作空间，并使用source
         <tag>Study Notes</tag>
       </tags>
   </entry>
+  <entry>
+    <title>ROS学习笔记（4）：通信机制之服务通信</title>
+    <url>/post/service_communication.html</url>
+    <content><![CDATA[<h1 id="服务通信">服务通信</h1>
+<p>前面介绍了话题通信，虽然使用频率较高，但是有一个小小的不足之处，就是话题通信的数据是单向传输的，订阅者被动接收发布者的消息。那么如果<strong>想要主动接收数据怎么办</strong>？这就要好好介绍今天的主角--<strong>服务通信</strong>了。</p>
+<p>服务通信也是ROS中一种极其常用的通信模式，服务通信是<strong>基于请求响应模式</strong>的，是一种应答机制。也即:
+一个节点A向另一个节点B发送请求，B接收处理请求并产生响应结果返回给A。适用于<strong>偶然的、对实时性有要求、有一定逻辑处理需求的数据传输场景</strong>。</p>
+<h1 id="理论模型">理论模型</h1>
+<p>该模型中涉及三个角色：<strong>ROS
+Master（管理者）</strong>、<strong>Server（服务端）</strong>、<strong>Client（客户端）</strong></p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052202615.png"
+                      
+                ></p>
+<ol start="0" type="1">
+<li><p>Server向ROS Master注册，有PRC、ROSRPC地址</p></li>
+<li><p>Client向ROS Master查询 指定服务</p></li>
+<li><p>ROS Master进行匹配，匹配成功返回Server的 ROSRPC URL</p></li>
+<li><p>Client向Server发送请求数据</p></li>
+<li><p>Server向Client返回响应数据</p></li>
+</ol>
+<p>注意：Server不需要协商的过程，直接返回ROSPRC地址。</p>
+<p>服务通信与话题通信的区别如下图</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052203989.png"
+                      
+                ></p>
+<p>详细区别请看该问答：<a class="link" 
+ href="https://www.zhihu.com/question/484442085" >ROS Topic 和 ROS Service
+有哪些区别？ <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="自定义srv">自定义srv</h1>
+<p>在使用服务通信的时候，数据载体是srv，和msg一样，需要我们手动创建。<br />
+srv 文件内的可用数据类型与 msg 文件一致，且定义 srv 实现流程与自定义 msg
+实现流程类似:</p>
+<ol type="1">
+<li><p>按照固定格式创建srv文件</p></li>
+<li><p>编辑配置文件</p></li>
+<li><p>编译生成中间文件</p></li>
+</ol>
+<p>咱们就用一个实例来进行演示。</p>
+<blockquote>
+<p>编写服务通信，客户端提交两个整数至服务端，服务端求和并响应结果到客户端。</p>
+</blockquote>
+<h2 id="定义srv文件">定义srv文件</h2>
+<p>在ROS包下新建一个srv文件夹，在srv文件夹里面新建一个srv文件</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">这里我又新建了一个工作空间、ROS包，你们可以选择在原来的工作空间内新建一个ROS包</span></span><br><span class="line">mkdir -p service_communication/src</span><br><span class="line">cd service_communication/</span><br><span class="line">catkin_make</span><br><span class="line"></span><br><span class="line">cd src</span><br><span class="line">catkin_create_pkg request_response roscpp rospy std_msgs</span><br><span class="line"></span><br><span class="line">cd request_response/</span><br><span class="line">mkdir srv</span><br><span class="line">cd srv</span><br><span class="line">vim AddTwoNum.srv</span><br></pre></td></tr></table></figure></div>
+<p>服务通信中，数据分成两部分，<strong>请求与响应</strong>，在 srv
+文件中请求和响应<strong>使用 --- 分割</strong>.<br />
+AddTwoNum.srv内容如下</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">int32 num1</span><br><span class="line">int32 num2</span><br><span class="line">---</span><br><span class="line">int32 sum</span><br></pre></td></tr></table></figure></div>
+<h2 id="编辑配置文件">编辑配置文件</h2>
+<p>和自定义msg编辑配置文件差不多，不同的是添加的是自定义srv，而不是自定义msg<br />
+首先回到ROS包下，修改 package.xml文件内容,添加编译依赖项、执行依赖项</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">此时路径：~/service_communication/src/request_response/srv</span></span><br><span class="line">vim ../package.xml</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052208202.png"
+                      
+                ></p>
+<hr />
+<p>下面修改ROS包下的CMakeLists.txt文件</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">此时路径：~/service_communication/src/request_response/srv</span></span><br><span class="line">vim ../CMakeLists.txt</span><br></pre></td></tr></table></figure></div>
+<p>添加CMake编译时找到依赖的包 message_generation</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052208176.png"
+                      
+                ></p>
+<p>添加自定义srv文件 AddTwoNum.srv</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052209106.png"
+                      
+                ></p>
+<p>生成srv</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052209165.png"
+                      
+                ></p>
+<p>添加了当前项目依赖的其他catkin项目</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052210157.png"
+                      
+                ></p>
+<h2 id="查看srv中间文件">查看srv中间文件</h2>
+<p>回到工作空间下，编译</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/service_communication/</span><br><span class="line">catkin_make</span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052211686.png"
+                      
+                ></p>
+<p>编译成功。<br />
+可以在工作空间下的devel文件夹下查找中间文件。<br />
+C++可以用的中间文件在
+~/service_communication/devel/include/request_response<br />
+其中service_communication为工作空间名字，request_response为ROS包的名字。</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052211749.png"
+                      
+                >
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052211647.png"
+                      
+                >
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052212443.png"
+                      
+                >
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052212590.png"
+                      
+                ></p>
+<p>Python可以用的中间文件在
+~/service_communication/devel/lib/python3/dist-packages/request_response/srv</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052213142.png"
+                      
+                >
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052213001.png"
+                      
+                ></p>
+<p>可以看一下官方示例：<a class="link" 
+ href="http://wiki.ros.org/ROS/Tutorials/CreatingMsgAndSrv#Using_srv" >创建msg、srv官方示例 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="c服务通信实例">C++服务通信实例</h1>
+<p>再次明确一下目标，<strong>编写服务通信，客户端提交两个整数至服务端，服务端求和并响应结果到客户端</strong>。</p>
+<h2 id="server实现">Server实现</h2>
+<p>首先在ROS包下的src文件夹里面创建 cpp文件，用于实现Server。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/service_communication/src/request_response/src/</span><br><span class="line">vim server.cpp</span><br></pre></td></tr></table></figure></div>
+<p>代码如下</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;ros/ros.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;request_response/AddTwoNum.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//回调函数，处理成功返回true</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">handle_request</span><span class="params">(request_response::AddTwoNum::Request&amp; req,</span></span></span><br><span class="line"><span class="params"><span class="function">                    request_response::AddTwoNum::Response&amp; resp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//根据业务逻辑，写两数之和。req为请求数据，resp为返回数据</span></span><br><span class="line">    <span class="type">int</span> num1 = req.num1;</span><br><span class="line">    <span class="type">int</span> num2 = req.num2;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">ROS_INFO</span>(<span class="string">&quot;服务器接收到的请求数据:num1 = %d,num2 = %d&quot;</span>,num1,num2);</span><br><span class="line"></span><br><span class="line">    resp.sum = num1 + num2;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">ROS_INFO</span>(<span class="string">&quot;求和结果为:sum = %d&quot;</span>,resp.sum);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//设置中文编码</span></span><br><span class="line">    <span class="built_in">setlocale</span>(LC_ALL,<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化节点 server_cpp</span></span><br><span class="line">    ros::<span class="built_in">init</span>(argc,argv,<span class="string">&quot;server_cpp&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建节点句柄</span></span><br><span class="line">    ros::NodeHandle nh;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建服务端</span></span><br><span class="line">    ros::ServiceServer server = nh.<span class="built_in">advertiseService</span>(<span class="string">&quot;AddInts&quot;</span>,handle_request);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">ROS_INFO</span>(<span class="string">&quot;服务器启动......&quot;</span>);</span><br><span class="line">    <span class="comment">//处理节点的循环事件，循环等待并调用回调函数</span></span><br><span class="line">    ros::<span class="built_in">spin</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>对于这段代码，需要解释的有以下内容</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line">ros::ServiceServer server = nh.<span class="built_in">advertiseService</span>(<span class="string">&quot;AddInts&quot;</span>,handle_request);</span><br></pre></td></tr></table></figure></div>
+<p>首先ros::ServiceServer是server的数据类型，是用来提供服务的服务器端接口。server由nh.advertiseService方法创建。<br />
+advertiseService有9个重载，这里我们用的是第二个。<strong>第一个参数为创建服务的名字，第二个参数为回调函数，用于处理客户端请求</strong>。</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052215613.png"
+                      
+                ></p>
+<p>关于回调函数，传递的两个参数分别为 请求数据、响应数据。</p>
+<hr />
+<p>接下来就是修改ROS包下的CMakeLists.txt了</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052216564.png"
+                      
+                ></p>
+<p>add_dependencies(server_cpp
+${PROJECT_NAME}_gencpp)这一行是为了防止srv文件没有编译完就直接编译cpp文件而导致报错。</p>
+<p>返回工作空间，编译、刷新环境变量，运行节点</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052217899.png"
+                      
+                ></p>
+<p>但是这时候没有请求服务器，看不到什么东西，此时可以使用rosservice
+call命令来请求。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">rosservice call [service] [args]</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">把[service]替换为自己的服务名字，然后空格 再按tab键会自动补全参数，只需要修改参数值即可</span></span><br></pre></td></tr></table></figure></div>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052217077.png"
+                      
+                ></p>
+<h2 id="client实现">Client实现</h2>
+<p>首先在ROS包下的src文件夹里面创建 cpp文件，用于实现Client。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/service_communication/src/request_response/src/</span><br><span class="line">vim client.cpp</span><br></pre></td></tr></table></figure></div>
+<p>文件内容如下</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;ros/ros.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;request_response/AddTwoNum.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//设置中文编码</span></span><br><span class="line">    <span class="built_in">setlocale</span>(LC_ALL,<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化节点 client_cpp</span></span><br><span class="line">    ros::<span class="built_in">init</span>(argc,argv,<span class="string">&quot;client_cpp&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建节点句柄</span></span><br><span class="line">    ros::NodeHandle nh;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建客户端</span></span><br><span class="line">    ros::ServiceClient client = nh.<span class="built_in">serviceClient</span>&lt;request_response::AddTwoNum&gt;(<span class="string">&quot;AddInts&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//定义数据</span></span><br><span class="line">    request_response::AddTwoNum data;</span><br><span class="line">    data.request.num1 = <span class="number">100</span>;</span><br><span class="line">    data.request.num2 = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//向服务器发送请求数据，返回值是bool类型。true表示响应成功，false表示响应失败。响应成功后，结果会在 data.response.sum里面</span></span><br><span class="line">    <span class="type">bool</span> flag = client.<span class="built_in">call</span>(data);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//处理响应数据</span></span><br><span class="line">    <span class="keyword">if</span>(flag)</span><br><span class="line">        <span class="built_in">ROS_INFO</span>(<span class="string">&quot;请求正常处理,响应结果:%d&quot;</span>,data.response.sum);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">ROS_ERROR</span>(<span class="string">&quot;请求处理失败....&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>这里，为了快速检验框架是否正确，直接把请求数据写好了，不是根据命令行传参的，后面会改进的。<br />
+对于这段代码，有如下几点需要解释。</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line">ros::ServiceClient client = nh.<span class="built_in">serviceClient</span>&lt;request_response::AddTwoNum&gt;(<span class="string">&quot;AddInts&quot;</span>);</span><br></pre></td></tr></table></figure></div>
+<p>ros::ServiceClient表明client的的数据类型，提供基于句柄的接口，为客户端连接提供服务。<br />
+client由
+serviceClient方法创建，有3个重载，我们使用的是第二个。<strong>&lt;&gt;里面的是服务类型，即自己生成的类；第一个参数为要连接的服务的名称</strong>。</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line">request_response::AddTwoNum data;</span><br><span class="line">data.request.num1 = <span class="number">100</span>;</span><br><span class="line">data.request.num2 = <span class="number">200</span>;</span><br></pre></td></tr></table></figure></div>
+<p>request_response::AddTwoNum为自己定义的srv生成的类，下面有request、response两个成员。而request有num1、num2两个成员变量，它们表示要发送的请求数据。</p>
+<hr />
+<p>然后修改ROS包下的CMakeLists.txt文件。</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052219519.png"
+                      
+                ></p>
+<p>回到工作空间编译，刷新环境变量，运行节点。</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052219247.png"
+                      
+                ></p>
+<p>可以看到，Client、Server都是没问题的。接下来在这个框架下面优化即可。</p>
+<hr />
+<p>前面咱们直接给请求数据赋值了，这是不符合要求的，我们需要根据命令行的参数去发送请求信息。<br />
+运行client_cpp节点的命令应该是下面这个格式</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">rosrun request_response client_cpp num1 num2</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">num1、num2替换为实际值</span></span><br></pre></td></tr></table></figure></div>
+<p>这时候就需要用到main函数的两个参数argc、argv了。</p>
+<p>argc（Argument
+Count）：表示命令行参数的数量。它是一个整数，并且至少为
+1，因为第一个参数总是程序的名称或者路径。<br />
+argv（Argument
+Vector）：是一个指向字符串数组的指针，这个数组包含了每个命令行参数的具体值。argv[0]
+是程序的名称，argv[1] 是传递给程序的第一个参数，以此类推，直到
+argv[argc-1]。数组的最后一个元素 argv[argc]
+是一个空指针（NULL），用于标识数组的结束。
+根据这两个，咱们重新写一些数据部分</p>
+<div class="highlight-container" data-rel="Cpp"><figure class="iseeu highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;ros/ros.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;request_response/AddTwoNum.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//设置中文编码</span></span><br><span class="line">    <span class="built_in">setlocale</span>(LC_ALL,<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(argc != <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">ROS_INFO</span>(<span class="string">&quot;请提交两个整数！&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化节点 client_cpp</span></span><br><span class="line">    ros::<span class="built_in">init</span>(argc,argv,<span class="string">&quot;client_cpp&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建节点句柄</span></span><br><span class="line">    ros::NodeHandle nh;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建客户端</span></span><br><span class="line">    ros::ServiceClient client = nh.<span class="built_in">serviceClient</span>&lt;request_response::AddTwoNum&gt;(<span class="string">&quot;AddInts&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//定义数据</span></span><br><span class="line">    request_response::AddTwoNum data;</span><br><span class="line">    data.request.num1 = <span class="built_in">atoi</span>(argv[<span class="number">1</span>]); <span class="comment">//atoi函数把字符类型转换为整数</span></span><br><span class="line">    data.request.num2 = <span class="built_in">atoi</span>(argv[<span class="number">2</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//向服务器发送请求数据，返回值是bool类型。true表示响应成功，false表示响应失败</span></span><br><span class="line">    <span class="type">bool</span> flag = client.<span class="built_in">call</span>(data);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//处理响应数据</span></span><br><span class="line">    <span class="keyword">if</span>(flag)</span><br><span class="line">        <span class="built_in">ROS_INFO</span>(<span class="string">&quot;请求正常处理,响应结果:%d&quot;</span>,data.response.sum);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">ROS_ERROR</span>(<span class="string">&quot;请求处理失败....&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>看效果图</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052222567.png"
+                      
+                ></p>
+<p>注意：这里是先启动了服务端，再启动客户端。如果先启动客户端的话，会报错，因为服务端还未启动。</p>
+<p>这里咱们可以使用 <strong>client.waitForExistence</strong>
+函数等待服务端启动
+(client.waitForExistence)[https://docs.ros.org/en/noetic/api/roscpp/html/classros_1_1ServiceClient.html#a530e3f1d55cf50ab00b8e5bbd9e8230a]</p>
+<p>或者使用 ros::service::waitForService("AddInts");
+"AddInts"为服务名字。</p>
+<p><a class="link" 
+ href="https://docs.ros.org/en/noetic/api/roscpp/html/namespaceros_1_1service.html#aabe996581255345b3383e66eaaedef5a" >ros::service::waitForService() <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="python服务通信实例">Python服务通信实例</h1>
+<p>还是上面的需求，用Pyhton来实现一下。</p>
+<h2 id="server实现-1">Server实现</h2>
+<p>首先在ROS包下新建一个scripts文件夹，然后在该文件夹内创建一个python文件。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/service_communication/src/request_response/</span><br><span class="line">mkdir scripts</span><br><span class="line">cd scripts</span><br><span class="line">vim server.py</span><br></pre></td></tr></table></figure></div>
+<p>文件内容</p>
+<div class="highlight-container" data-rel="Py"><figure class="iseeu highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment">#! /usr//env binpython</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">from</span> request_response.srv <span class="keyword">import</span> AddTwoNum,AddTwoNumRequest,AddTwoNumResponse</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">回调函数，用于处理请求数据</span></span><br><span class="line"><span class="string">参数:请求数据 </span></span><br><span class="line"><span class="string">返回：响应数据</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">handle_request</span>(<span class="params">request</span>):</span><br><span class="line">    <span class="comment">#取出请求数据</span></span><br><span class="line">    num1 = request.num1</span><br><span class="line">    num2 = request.num2</span><br><span class="line"></span><br><span class="line">    <span class="comment">#求和</span></span><br><span class="line">    <span class="built_in">sum</span> = num1 + num2</span><br><span class="line"></span><br><span class="line">    rospy.loginfo(<span class="string">&quot;请求数据为: num1 = %d,num2 = %d;求和结果: sum = %d&quot;</span>,num1,num2,<span class="built_in">sum</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#实例化响应数据，赋值后返回</span></span><br><span class="line">    response = AddTwoNumResponse()</span><br><span class="line">    response.<span class="built_in">sum</span> = <span class="built_in">sum</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> response</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    </span><br><span class="line">    <span class="comment">#初始化节点server_py</span></span><br><span class="line">    rospy.init_node(<span class="string">&quot;server_py&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#创建server</span></span><br><span class="line">    server = rospy.Service(<span class="string">&quot;AddInts_py&quot;</span>,AddTwoNum,handle_request)</span><br><span class="line"></span><br><span class="line">    rospy.loginfo(<span class="string">&quot;服务已启动...&quot;</span>)</span><br><span class="line">    <span class="comment">#循环处理回调函数</span></span><br><span class="line">    rospy.spin()</span><br></pre></td></tr></table></figure></div>
+<hr />
+<div class="highlight-container" data-rel="Py"><figure class="iseeu highlight py"><table><tr><td class="code"><pre><span class="line">server = rospy.Service(<span class="string">&quot;AddInts_py&quot;</span>,AddTwoNum,handle_request)</span><br><span class="line"><span class="comment">#server = rospy.Service(name,service_class,handler,buff_size=DEFAULT_BUFF_SIZE, error_handler=None)</span></span><br></pre></td></tr></table></figure></div>
+<p>就是创建服务端。第一个参数为服务名字，第二个参数为srv生成的类；第三个参数为处理请求数据的函数。</p>
+<hr />
+<p>修改ROS包下的CMakeLists.txt文件</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052231116.png"
+                      
+                ></p>
+<p>运行节点，使用rosservice call测试</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052231581.png"
+                      
+                ></p>
+<p>通过，接下来开始写client</p>
+<h2 id="client实现-1">Client实现</h2>
+<p>首先ROS包下的scripts文件夹内创建一个python文件。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/service_communication/src/request_response/scripts</span><br><span class="line">vim client.py</span><br></pre></td></tr></table></figure></div>
+<p>文件内容</p>
+<div class="highlight-container" data-rel="Py"><figure class="iseeu highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">from</span> request_response.srv <span class="keyword">import</span> AddTwoNum,AddTwoNumRequest,AddTwoNumResponse</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="comment">#初始化节点</span></span><br><span class="line">    rospy.init_node(<span class="string">&quot;client_py&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#创建客户端</span></span><br><span class="line">    client = rospy.ServiceProxy(<span class="string">&quot;AddInts_py&quot;</span>,AddTwoNum)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#等待服务端启动</span></span><br><span class="line">    client.wait_for_service()</span><br><span class="line"></span><br><span class="line">    <span class="comment">#向服务端发送请求</span></span><br><span class="line">    response = client.call(<span class="number">11</span>,<span class="number">55</span>)</span><br><span class="line"></span><br><span class="line">    rospy.loginfo(<span class="string">&quot;响应数据为:sum = %d&quot;</span>,response.<span class="built_in">sum</span>)</span><br></pre></td></tr></table></figure></div>
+<p>修改CMakeLists.txt文件</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052232652.png"
+                      
+                ></p>
+<p>最后运行测试</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052233339.png"
+                      
+                ></p>
+<p>这里咱们把请求数据固定了，再优化一下，可以根据命令行的参数自定义请求数据。<br />
+在sys下有一个列表可以判断参数个数，咱们利用这个来实现。</p>
+<div class="highlight-container" data-rel="Py"><figure class="iseeu highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">from</span> request_response.srv <span class="keyword">import</span> AddTwoNum,AddTwoNumRequest,AddTwoNumResponse</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) != <span class="number">3</span>:</span><br><span class="line">        rospy.logerr(<span class="string">&quot;请输入两个参数!!!&quot;</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#初始化节点</span></span><br><span class="line">    rospy.init_node(<span class="string">&quot;client_py&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#创建客户端</span></span><br><span class="line">    client = rospy.ServiceProxy(<span class="string">&quot;AddInts_py&quot;</span>,AddTwoNum)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#等待服务端启动</span></span><br><span class="line">    client.wait_for_service()</span><br><span class="line"></span><br><span class="line">    <span class="comment">#向服务端发送请求</span></span><br><span class="line">    num1 = <span class="built_in">int</span>(sys.argv[<span class="number">1</span>])</span><br><span class="line">    num2 = <span class="built_in">int</span>(sys.argv[<span class="number">2</span>])</span><br><span class="line"></span><br><span class="line">    response = client.call(num1,num2)</span><br><span class="line"></span><br><span class="line">    rospy.loginfo(<span class="string">&quot;响应数据为:sum = %d&quot;</span>,response.<span class="built_in">sum</span>)</span><br></pre></td></tr></table></figure></div>
+<p>通过ServiceProxy创建一个客户端，第一个参数为服务名字，第二个参数为srv生成的类</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202312052233109.png"
+                      
+                ></p>
+<p>官方示例：<a class="link" 
+ href="http://wiki.ros.org/rospy/Overview/Services" >官方示例 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <tags>
+        <tag>ROS</tag>
+        <tag>Study Notes</tag>
+      </tags>
+  </entry>
 </search>
