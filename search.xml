@@ -3353,4 +3353,118 @@ argv[argc-1]。数组的最后一个元素 argv[argc]
         <tag>Study Notes</tag>
       </tags>
   </entry>
+  <entry>
+    <title>解决Gazebo Scene界面无法铺满全屏</title>
+    <url>/post/Gazebo_Scene_Scaling_Problem.html</url>
+    <content><![CDATA[<h1 id="问题介绍">问题介绍</h1>
+<p>在一个风和日丽的下午，我照常打开Gazebo进行仿真，却发现Scene界面无法铺满屏幕，且只显示在左上角，并没有完全铺满，其余部分都是后面的页面（之前打开的东西，说不清楚，请看图）</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311139928.jpg"
+                      
+                ></p>
+<figure>
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311115457.png"
+                     
+alt="无法铺满图片" 
+                >
+<figcaption aria-hidden="true">无法铺满图片</figcaption>
+</figure>
+<figure>
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311138336.png"
+                     
+alt="无法铺满图片2" 
+                >
+<figcaption aria-hidden="true">无法铺满图片2</figcaption>
+</figure>
+<p>左右移动scene
+会卡出来很多东西（下面图片来自Github上的，现在自己无法复现此情况）</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311139030.png"
+                      
+                ></p>
+<p>Gazebo退出全屏 再全屏 会出现多个scene等等问题</p>
+<h1 id="锁定问题所在">锁定问题所在</h1>
+<p>我刚开始以为是卡了，重启了几次依旧如此，在QQ群问了大佬
+依旧找不出问题。于是果断重新刷一下系统（我搞的双系统哈哈）</p>
+<p>当我重装好系统，配置好ROS环境后，再次打开Gazebo
+依旧如此。实在受不了了，于是我问了一下AI，它回答了重要的一点</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311142962.png"
+                      
+                ></p>
+<p><strong>如果你的显示器是高分辨率显示器（HiDPI），尝试禁用 HiDPI
+模式，看看是否有帮助</strong></p>
+<p>这让我想起了了，我的电脑是<strong>2k屏</strong>的，貌似和这个有关系。</p>
+<p>它给出了禁用HidPI模式，我没有去试。
+我不知道是什么东西，但是我又看到了可以通过设置调整缩放比例来禁用（我认为操作不得当时，图形化界面可以及时复原）</p>
+<p><strong>使用图形界面：如果你使用的是 GNOME
+桌面环境，可以尝试在设置中查找“显示”或“屏幕”选项，然后调整缩放比例来禁用
+HiDPI 模式</strong></p>
+<p>当我把缩放比例调整 100 %
+时，已经正常了，但是由于分辨率比较高，导致字体特别小，费眼。但是调低分辨率
+缩放比例为100%时，又太糊了，还是不舒服。
+这显然不是最优的解决办法，但是可以锁定问题所在
+<strong>HidPI</strong></p>
+<p>于是我就想起万能的Github了，对于国外的软件，上Github是最佳选择，浏览器根本搜索不到有用信息....</p>
+<p>先找到Gazebo的仓库 <a class="link" 
+ href="https://github.com/gazebosim/gazebo-classic" >Gazebo
+仓库 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，点击Issues</p>
+<p>映入眼帘的就是 GAZEBO does not scale the map to the entire screen</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311144942.png"
+                      
+                ></p>
+<p>很可惜，并没有什么有用信息</p>
+<p>接下来搜索一下 HidPI，不出所料 果然其他人和我有一样的问题 <a class="link" 
+ href="https://github.com/gazebosim/gazebo-classic/issues/2688" >Problem
+with HiDPI screen on Ubuntu 18.04 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>
+虽然版本有点老，但是最高issue成功解决了此问题</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311144182.png"
+                      
+                ></p>
+<h1 id="解决办法">解决办法</h1>
+<p>在 .bashrc 里面添加两行代码</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">export QT_AUTO_SCREEN_SCALE_FACTOR=0</span><br><span class="line">export QT_SCREEN_SCALE_FACTORS=[1.0]</span><br></pre></td></tr></table></figure></div>
+<p>第一行代码作用为
+禁用了Qt的自动屏幕缩放因子调整功能。Qt应用程序在高分辨率屏幕上显示时，会根据屏幕的缩放因子自动进行缩放，但有时这会导致显示效果不理想，禁用这一功能可以避免一些显示问题。</p>
+<p>第二行行代码设置了Qt应用程序的屏幕缩放因子为1.0，即不进行缩放。这可以确保Qt应用程序在高分辨率屏幕上显示时大小合适，避免因为缩放导致的显示问题。</p>
+<p>在开每一个终端的时候，就会加载.bashrc的内容</p>
+<p>这样就成功解决了这个问题</p>
+<p><img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/renyuhui0415/blogimg@main/202403311145406.png"
+                      
+                ></p>
+]]></content>
+      <tags>
+        <tag>ROS</tag>
+        <tag>Gazebo</tag>
+      </tags>
+  </entry>
 </search>
